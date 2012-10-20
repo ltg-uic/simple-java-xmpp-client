@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 public class SimpleXMPPClient {
 	
 	// Logger
-	protected Logger log = LoggerFactory.getLogger(this.getClass());
+	protected Logger log = LoggerFactory.getLogger(getClass());
 	// Connection
 	protected XMPPConnection connection = null;
 	// Group chat (can be null)
