@@ -1,7 +1,8 @@
 package ltg.commons.examples;
 
-import ltg.commons.Event;
-import ltg.commons.EventListener;
+import org.jivesoftware.smack.packet.Message;
+
+import ltg.commons.MessageListener;
 import ltg.commons.SimpleXMPPClient;
 
 /**
@@ -29,10 +30,11 @@ public class AsynchronousXMPPClient {
 		// ... so let's go ahead and make ourself busy... but before we do that... 
 		 
 		// ... let's register the packet handler with our XMPP client...
-		sc.registerEventListener(new EventListener() {
+		sc.registerEventListener(new MessageListener() {
+			
 			@Override
-			public void processEvent(Event event) {
-				System.out.println(event);
+			public void processMessage(Message m) {
+				System.out.println(m.getBody());
 			}
 		});
 		

@@ -74,21 +74,18 @@ public class SimpleXMPPClient {
 	}
 	
 	
-	public Event nextEvent() {
+	public Message nextMessage() {
 		if (packetCollector==null)
 			packetCollector = connection.createPacketCollector(new PacketTypeFilter(Message.class));
-		Message m = (Message) packetCollector.nextResult();
-		return new Event(m.getFrom(), m.getBody());
+		return (Message) packetCollector.nextResult();
 	}
 	
 	
-	public void registerEventListener(final EventListener eventListener) {
+	public void registerEventListener(final MessageListener eventListener) {
 		PacketListener pl = new PacketListener() {
 			@Override
 			public void processPacket(Packet packet) {
-				Message m = (Message) packet;
-				Event e = new Event(m.getFrom(), m.getBody());
-				eventListener.processEvent(e);
+				eventListener.processMessage((Message) packet);
 			}
 		};
 		connection.addPacketListener(pl, new PacketTypeFilter(Message.class));

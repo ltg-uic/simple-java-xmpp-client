@@ -26,7 +26,7 @@ public class SynchronousXMPPClient {
 		// ... so let's go ahead and wait for a message to arrive...
 		while (!Thread.currentThread().isInterrupted()) {
 			// ... and process it ...
-			System.out.println(sc.nextEvent());
+			System.out.println(sc.nextMessage());
 		}
 		// ... and finally disconnect.
 		sc.disconnect();
