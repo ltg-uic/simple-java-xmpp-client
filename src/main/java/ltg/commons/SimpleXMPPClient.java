@@ -8,8 +8,6 @@ import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smackx.muc.MultiUserChat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This is an XMPP client that is ready to use. It handles only one connection which can be 
@@ -22,8 +20,6 @@ import org.slf4j.LoggerFactory;
  */
 public class SimpleXMPPClient {
 	
-	// Logger
-	protected Logger log = LoggerFactory.getLogger(getClass());
 	// Connection
 	protected XMPPConnection connection = null;
 	// Group chat (can be null)
@@ -42,19 +38,19 @@ public class SimpleXMPPClient {
 		try {
 			connection.connect();
 		} catch (XMPPException e) {
-			log.error("Impossible to CONNECT to the XMPP server, terminating");
+			System.err.println("Impossible to CONNECT to the XMPP server, terminating");
 			Thread.currentThread().interrupt();
 		}
 		// Authenticate
 		try {
 			connection.login(username, password);
 		} catch (XMPPException e) {
-			log.error("Impossible to LOGIN to the XMPP server, terminating");
+			System.err.println("Impossible to LOGIN to the XMPP server, terminating");
 			Thread.currentThread().interrupt();
 		} catch (IllegalArgumentException e) {
 			// This needs to be here because the MultiUserChat implementation
 			// in smackx is crappy. They throw exceptions if the username is "".
-			log.error("Impossible to LOGIN to the XMPP server, terminating");
+			System.err.println("Impossible to LOGIN to the XMPP server, terminating");
 			Thread.currentThread().interrupt();
 		}
 	}
@@ -68,7 +64,7 @@ public class SimpleXMPPClient {
 		 try {
 			groupChat.join(connection.getUser());
 		} catch (XMPPException e) {
-			log.error("Impossible to join GROUPCHAT, terminating");
+			System.err.println("Impossible to join GROUPCHAT, terminating");
 			Thread.currentThread().interrupt();
 		}
 	}
@@ -94,7 +90,7 @@ public class SimpleXMPPClient {
 	
 	public void sendMessage(String to, String message) {
 		if (connection==null || !connection.isAuthenticated()){
-			log.error("Impossible to send message to " +to + ": we have been disconnected! Terminating");
+			System.err.println("Impossible to send message to " +to + ": we have been disconnected! Terminating");
 			Thread.currentThread().interrupt();
 		}
 		Message m = new Message(to, Message.Type.normal);
@@ -105,7 +101,7 @@ public class SimpleXMPPClient {
 	
 	public void sendMessage(String message) {
 		if (connection==null || !connection.isAuthenticated() || !groupChat.isJoined()){
-			log.error("Impossible to send message to groupchat: we have been disconnected! Terminating");
+			System.err.println("Impossible to send message to groupchat: we have been disconnected! Terminating");
 			Thread.currentThread().interrupt();
 		}
 		Message m = new Message(groupChat.getRoom(), Message.Type.groupchat);
