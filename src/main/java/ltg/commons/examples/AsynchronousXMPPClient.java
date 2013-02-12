@@ -38,21 +38,16 @@ public class AsynchronousXMPPClient {
 			}
 		});
 		
-		// ... and now we can make ourselves busy...
+		// ... and now we can make ourselves busy
 		while(true) {
 			try {
 				Thread.sleep(5000);
 			} catch (InterruptedException e) {
-				// Ignored
+				sc.disconnect();
 			}
 		}
 		
-		// ... unless the main thread is suspended we will never get to this point because 
-		// the main thread controls his own destiny...
-		
-		// ... so we'll never get to this but before exiting we should disconnect.
-		//sc.disconnect();
-
+		// NOTE: unless the main thread is suspended we will never get to this point 
 	}
 
 }
