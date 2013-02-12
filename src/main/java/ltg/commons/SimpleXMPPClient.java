@@ -19,19 +19,25 @@ import org.jivesoftware.smackx.muc.MultiUserChat;
  *
  */
 public class SimpleXMPPClient {
-	
+
 	// Connection
 	protected XMPPConnection connection = null;
 	// Group chat (can be null)
 	protected MultiUserChat groupChat = null;
 	// Packet collector (can be null)
 	protected PacketCollector packetCollector = null; 
+
 	
-	
-	public SimpleXMPPClient(String fullJid, String password) {
+	/**
+	 * Creates a simple client and connects it to the XMPP server 
+	 * 
+	 * @param username
+	 * @param password
+	 */
+	public SimpleXMPPClient(String username, String password) {
 		// Parse username and hostname
-		String[] sa = fullJid.split("@", 2);
-		String username = sa[0];
+		String[] sa = username.split("@", 2);
+		String uname = sa[0];
 		String hostname = sa[1];
 		// Connect
 		connection = new XMPPConnection(hostname);
@@ -43,7 +49,7 @@ public class SimpleXMPPClient {
 		}
 		// Authenticate
 		try {
-			connection.login(username, password);
+			connection.login(uname, password);
 		} catch (XMPPException e) {
 			System.err.println("Impossible to LOGIN to the XMPP server, terminating");
 			Thread.currentThread().interrupt();
@@ -54,29 +60,48 @@ public class SimpleXMPPClient {
 			Thread.currentThread().interrupt();
 		}
 	}
+
 	
-	
-	public SimpleXMPPClient(String fullJid, String password, String chatRoom) {
+	/**
+	 * Creates a simple client, connects it to the server and joins a chat room.
+	 * 
+	 * @param username
+	 * @param password
+	 * @param chatRoom
+	 */
+	public SimpleXMPPClient(String username, String password, String chatRoom) {
 		// Connect and authenticate
-		this(fullJid, password);
-		// Initialize and join chatRoom
-		 groupChat = new MultiUserChat(connection, chatRoom);
-		 try {
-			groupChat.join(connection.getUser());
-		} catch (XMPPException e) {
-			System.err.println("Impossible to join GROUPCHAT, terminating");
-			Thread.currentThread().interrupt();
+		this(username, password);
+		if (connection.isAuthenticated() && chatRoom!=null) {
+			// Initialize and join chatRoom
+			groupChat = new MultiUserChat(connection, chatRoom);
+			try {
+				groupChat.join(connection.getUser());
+			} catch (XMPPException e) {
+				System.err.println("Impossible to join GROUPCHAT, terminating");
+				Thread.currentThread().interrupt();
+			}
 		}
 	}
+
 	
-	
+	/**
+	 * Fetches the last message in the queue.
+	 * 
+	 * @return
+	 */
 	public Message nextMessage() {
 		if (packetCollector==null)
 			packetCollector = connection.createPacketCollector(new PacketTypeFilter(Message.class));
 		return (Message) packetCollector.nextResult();
 	}
+
 	
-	
+	/**
+	 * Registers an event listener.
+	 * 
+	 * @param eventListener
+	 */
 	public void registerEventListener(final MessageListener eventListener) {
 		PacketListener pl = new PacketListener() {
 			@Override
@@ -86,8 +111,14 @@ public class SimpleXMPPClient {
 		};
 		connection.addPacketListener(pl, new PacketTypeFilter(Message.class));
 	}
+
 	
-	
+	/**
+	 * Sends a point to point message to another client.
+	 * 
+	 * @param to
+	 * @param message
+	 */
 	public void sendMessage(String to, String message) {
 		if (connection==null || !connection.isAuthenticated()){
 			System.err.println("Impossible to send message to " +to + ": we have been disconnected! Terminating");
@@ -97,8 +128,13 @@ public class SimpleXMPPClient {
 		m.setBody(message);
 		connection.sendPacket(m);
 	}
+
 	
-	
+	/**
+	 * Sends a message to the whole grouchat.
+	 * 
+	 * @param message
+	 */
 	public void sendMessage(String message) {
 		if (connection==null || !connection.isAuthenticated() || !groupChat.isJoined()){
 			System.err.println("Impossible to send message to groupchat: we have been disconnected! Terminating");
@@ -106,12 +142,25 @@ public class SimpleXMPPClient {
 		}
 		Message m = new Message(groupChat.getRoom(), Message.Type.groupchat);
 		m.setBody(message);
-        connection.sendPacket(m);
+		connection.sendPacket(m);
 	}
 	
 	
+	/**
+	 * Returns the username.
+	 * 
+	 * @return
+	 */
+	public String getUsername() {
+		return connection.getUser();
+	}
+
+
+	/**
+	 * Disconnects the client.
+	 */
 	public void disconnect() {
-		if (groupChat.isJoined()) {
+		if (groupChat!=null && groupChat.isJoined()) {
 			groupChat.leave();
 			groupChat = null;
 		}
