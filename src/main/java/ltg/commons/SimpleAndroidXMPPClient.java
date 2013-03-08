@@ -18,7 +18,7 @@ import org.jivesoftware.smackx.muc.MultiUserChat;
  * @author tebemis
  *
  */
-public class SimpleXMPPClient {
+public class SimpleAndroidXMPPClient {
 
 	// Connection
 	protected XMPPConnection connection = null;
@@ -35,7 +35,7 @@ public class SimpleXMPPClient {
 	 * @param password
 	 * @throws XMPPException 
 	 */
-	public SimpleXMPPClient(String username, String password) throws XMPPException {
+	public SimpleAndroidXMPPClient(String username, String password) throws XMPPException {
 		// Parse username and hostname
 		String[] sa = username.split("@", 2);
 		String uname = sa[0];
@@ -71,7 +71,7 @@ public class SimpleXMPPClient {
 	 * @param chatRoom
 	 * @throws XMPPException 
 	 */
-	public SimpleXMPPClient(String username, String password, String chatRoom) throws XMPPException {
+	public SimpleAndroidXMPPClient(String username, String password, String chatRoom) throws XMPPException {
 		// Connect and authenticate
 		this(username, password);
 		if (connection.isAuthenticated() && chatRoom!=null) {

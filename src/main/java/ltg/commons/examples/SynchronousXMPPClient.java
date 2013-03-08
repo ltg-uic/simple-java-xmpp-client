@@ -2,7 +2,7 @@ package ltg.commons.examples;
 
 import org.jivesoftware.smack.XMPPException;
 
-import ltg.commons.SimpleXMPPClient;
+import ltg.commons.SimpleAndroidXMPPClient;
 
 /**
  * This example demonstrates the use of SimpleXMPPClient class.
@@ -18,9 +18,9 @@ public class SynchronousXMPPClient {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		SimpleXMPPClient sc = null;
+		SimpleAndroidXMPPClient sc = null;
 		try {
-			sc = new SimpleXMPPClient("fg-test@ltg.evl.uic.edu", 
+			sc = new SimpleAndroidXMPPClient("fg-test@ltg.evl.uic.edu", 
 					"fg-test", 
 					"fg-pilot-oct12@conference.ltg.evl.uic.edu");
 		} catch (XMPPException e) {
