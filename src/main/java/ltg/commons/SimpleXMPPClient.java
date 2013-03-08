@@ -33,8 +33,9 @@ public class SimpleXMPPClient {
 	 * 
 	 * @param username
 	 * @param password
+	 * @throws XMPPException 
 	 */
-	public SimpleXMPPClient(String username, String password) {
+	public SimpleXMPPClient(String username, String password) throws XMPPException {
 		// Parse username and hostname
 		String[] sa = username.split("@", 2);
 		String uname = sa[0];
@@ -45,19 +46,19 @@ public class SimpleXMPPClient {
 			connection.connect();
 		} catch (XMPPException e) {
 			System.err.println("Impossible to CONNECT to the XMPP server, terminating");
-			Thread.currentThread().interrupt();
+			throw new XMPPException();
 		}
 		// Authenticate
 		try {
 			connection.login(uname, password);
 		} catch (XMPPException e) {
 			System.err.println("Impossible to LOGIN to the XMPP server, terminating");
-			Thread.currentThread().interrupt();
+			throw new XMPPException();
 		} catch (IllegalArgumentException e) {
 			// This needs to be here because the MultiUserChat implementation
 			// in smackx is crappy. They throw exceptions if the username is "".
 			System.err.println("Impossible to LOGIN to the XMPP server, terminating");
-			Thread.currentThread().interrupt();
+			throw new XMPPException();
 		}
 	}
 
@@ -68,8 +69,9 @@ public class SimpleXMPPClient {
 	 * @param username
 	 * @param password
 	 * @param chatRoom
+	 * @throws XMPPException 
 	 */
-	public SimpleXMPPClient(String username, String password, String chatRoom) {
+	public SimpleXMPPClient(String username, String password, String chatRoom) throws XMPPException {
 		// Connect and authenticate
 		this(username, password);
 		if (connection.isAuthenticated() && chatRoom!=null) {
@@ -79,7 +81,7 @@ public class SimpleXMPPClient {
 				groupChat.join(connection.getUser());
 			} catch (XMPPException e) {
 				System.err.println("Impossible to join GROUPCHAT, terminating");
-				Thread.currentThread().interrupt();
+				throw new XMPPException();
 			}
 		}
 	}
@@ -124,6 +126,8 @@ public class SimpleXMPPClient {
 			System.err.println("Impossible to send message to " +to + ": we have been disconnected! Terminating");
 			Thread.currentThread().interrupt();
 		}
+		if (to==null || to.isEmpty())
+			return;
 		Message m = new Message(to, Message.Type.normal);
 		m.setBody(message);
 		connection.sendPacket(m);

@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>ltg</groupId>
   <artifactId>simple-java-xmpp-client</artifactId>
-  <version>1.4</version>
+  <version>1.5</version>
   <name>Simple XMPP client </name>
   
   <properties>

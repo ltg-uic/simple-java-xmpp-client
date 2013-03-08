@@ -1,5 +1,7 @@
 package ltg.commons.examples;
 
+import org.jivesoftware.smack.XMPPException;
+
 import ltg.commons.SimpleXMPPClient;
 
 /**
@@ -16,9 +18,14 @@ public class SynchronousXMPPClient {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		SimpleXMPPClient sc = new SimpleXMPPClient("fg-test@ltg.evl.uic.edu", 
-				"fg-test", 
-				"fg-pilot-oct12@conference.ltg.evl.uic.edu");
+		SimpleXMPPClient sc = null;
+		try {
+			sc = new SimpleXMPPClient("fg-test@ltg.evl.uic.edu", 
+					"fg-test", 
+					"fg-pilot-oct12@conference.ltg.evl.uic.edu");
+		} catch (XMPPException e) {
+			System.exit(-1);
+		}
 		
 		// We are now connected and in the group chat room. If we don't do something
 		// the main will terminate... 
