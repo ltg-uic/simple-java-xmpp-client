@@ -131,7 +131,7 @@ public class SimpleXMPPClient {
 
 	
 	/**
-	 * Sends a message to the whole grouchat.
+	 * Sends a message to the whole group chat.
 	 * 
 	 * @param message
 	 */
