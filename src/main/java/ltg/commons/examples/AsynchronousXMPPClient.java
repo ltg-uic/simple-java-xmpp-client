@@ -7,7 +7,7 @@ import ltg.commons.SimpleXMPPClient;
 
 /**
  * This example demonstrates the use of SimpleXMPPClient class.
- * The class is used to ashynchronously process packets.
+ * The class is used to asynchronously process packets.
  * This is useful whenever the main thread is already busy doing 
  * stuff and we want to interrupt.
  * 
@@ -20,9 +20,7 @@ public class AsynchronousXMPPClient {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		SimpleXMPPClient sc = new SimpleXMPPClient("fg-test@ltg.evl.uic.edu", 
-				"fg-test", 
-				"fg-pilot-oct12@conference.ltg.evl.uic.edu");
+		SimpleXMPPClient sc = new SimpleXMPPClient("test@ltg.evl.uic.edu", "test", "test-room@conference.ltg.evl.uic.edu");
 		
 		// We are now connected and in the group chat room. If we don't do something
 		// the main will terminate... 
