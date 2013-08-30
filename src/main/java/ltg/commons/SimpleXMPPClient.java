@@ -37,10 +37,21 @@ public class SimpleXMPPClient {
 	public SimpleXMPPClient(String username, String password) {
 		// Parse username and hostname
 		String[] sa = username.split("@", 2);
-		String uname = sa[0];
-		String hostname = sa[1];
+		String uname = null;
+		String hostname = null;
+		try {
+			uname = sa[0];
+			hostname = sa[1];
+		} catch (Exception e) {
+			System.err.println(username + " is not a valid JID, impossible to CONNECT to the XMPP server, terminating");
+			Thread.currentThread().interrupt();
+		}
 		// Connect
-		connection = new XMPPConnection(hostname);
+		try {
+			connection = new XMPPConnection(hostname);
+		} catch (Exception e) {
+			System.exit(-1);
+		}
 		try {
 			connection.connect();
 		} catch (XMPPException e) {
