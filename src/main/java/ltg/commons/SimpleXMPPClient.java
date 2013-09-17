@@ -188,6 +188,8 @@ public class SimpleXMPPClient {
 	 * @throws XMPPException 
 	 */
 	public static String[] splitUserAndHost(String fullJID) throws XMPPException {
+		if (fullJID==null || fullJID.isEmpty())
+			throw new XMPPException(fullJID + " is not a valid JID");
 		String[] sa = fullJID.split("@", 2);
 		if (sa.length!=2 || sa[0]==null || sa[1]==null || sa[0].isEmpty() || sa[1].isEmpty() ) 
 			throw new XMPPException(fullJID + " is not a valid JID");
