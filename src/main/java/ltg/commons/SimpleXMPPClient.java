@@ -27,7 +27,7 @@ public class SimpleXMPPClient {
 	// Packet collector (can be null)
 	protected PacketCollector packetCollector = null; 
 
-	
+
 	/**
 	 * Creates a simple client and connects it to the XMPP server 
 	 * 
@@ -36,13 +36,14 @@ public class SimpleXMPPClient {
 	 */
 	public SimpleXMPPClient(String username, String password) {
 		// Parse username and hostname
-		String[] sa = username.split("@", 2);
+		String[] sa;
 		String uname = null;
 		String hostname = null;
 		try {
+			sa = splitUserAndHost(username);
 			uname = sa[0];
 			hostname = sa[1];
-		} catch (Exception e) {
+		} catch (XMPPException e1) {
 			System.err.println(username + " is not a valid JID, impossible to CONNECT to the XMPP server, terminating");
 			System.exit(-1);
 		}
@@ -68,7 +69,7 @@ public class SimpleXMPPClient {
 		}
 	}
 
-	
+
 	/**
 	 * Creates a simple client, connects it to the server and joins a chat room.
 	 * 
@@ -91,7 +92,7 @@ public class SimpleXMPPClient {
 		}
 	}
 
-	
+
 	/**
 	 * Fetches the last message in the queue.
 	 * 
@@ -103,7 +104,7 @@ public class SimpleXMPPClient {
 		return (Message) packetCollector.nextResult();
 	}
 
-	
+
 	/**
 	 * Registers an event listener.
 	 * 
@@ -119,7 +120,7 @@ public class SimpleXMPPClient {
 		connection.addPacketListener(pl, new PacketTypeFilter(Message.class));
 	}
 
-	
+
 	/**
 	 * Sends a point to point message to another client.
 	 * 
@@ -136,7 +137,7 @@ public class SimpleXMPPClient {
 		connection.sendPacket(m);
 	}
 
-	
+
 	/**
 	 * Sends a message to the whole group chat.
 	 * 
@@ -151,8 +152,8 @@ public class SimpleXMPPClient {
 		m.setBody(message);
 		connection.sendPacket(m);
 	}
-	
-	
+
+
 	/**
 	 * Returns the username.
 	 * 
@@ -175,6 +176,22 @@ public class SimpleXMPPClient {
 			connection.disconnect();
 			connection = null;
 		}
+	}
+
+
+	/**
+	 * Splits a JID in the form username@domain into the two components.
+	 * If the user name can't be properly parsed, an exception is generated.
+	 * 
+	 * @param fullJID the JID that needs to be parsed
+	 * @return an array with two elements containing the the username and domain
+	 * @throws XMPPException 
+	 */
+	public static String[] splitUserAndHost(String fullJID) throws XMPPException {
+		String[] sa = fullJID.split("@", 2);
+		if (sa.length!=2 || sa[0]==null || sa[1]==null || sa[0].isEmpty() || sa[1].isEmpty() ) 
+			throw new XMPPException(fullJID + " is not a valid JID");
+		return sa;
 	}
 
 }
