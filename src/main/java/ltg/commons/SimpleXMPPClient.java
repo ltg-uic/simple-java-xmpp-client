@@ -1,5 +1,8 @@
 package ltg.commons;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.jivesoftware.smack.PacketCollector;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPConnection;
@@ -23,7 +26,7 @@ public class SimpleXMPPClient {
 	// Connection
 	protected XMPPConnection connection = null;
 	// Group chat (can be null)
-	protected MultiUserChat groupChat = null;
+	protected List <MultiUserChat> chatRooms = null;
 	// Packet collector (can be null)
 	protected PacketCollector packetCollector = null; 
 
@@ -71,7 +74,7 @@ public class SimpleXMPPClient {
 
 
 	/**
-	 * Creates a simple client, connects it to the server and joins a chat room.
+	 * Creates a simple client, connects to the server and joins a chat room.
 	 * 
 	 * @param username
 	 * @param password
@@ -82,11 +85,38 @@ public class SimpleXMPPClient {
 		this(username, password);
 		if (connection.isAuthenticated() && chatRoom!=null) {
 			// Initialize and join chatRoom
-			groupChat = new MultiUserChat(connection, chatRoom);
+			chatRooms = new ArrayList<MultiUserChat>();
+			chatRooms.add(new MultiUserChat(connection, chatRoom));
 			try {
-				groupChat.join(connection.getUser());
+				chatRooms.get(0).join(connection.getUser());
 			} catch (XMPPException e) {
 				System.err.println("Impossible to join GROUPCHAT, terminating");
+				System.exit(-1);
+			}
+		}
+	}
+	
+	
+	/**
+	 * Creates a simple client, connects to the server and joins a list of chat rooms.
+	 * 
+	 * @param username
+	 * @param password
+	 * @param chatRooms
+	 */
+	public SimpleXMPPClient(String username, String password, List<String> chatRooms) {
+		// Connect and authenticate
+		this(username, password);
+		if (connection.isAuthenticated() && chatRooms!=null && !chatRooms.isEmpty()) {
+			// Initialize and join chatRoom
+			this.chatRooms = new ArrayList<MultiUserChat>();
+			for(String cr : chatRooms)
+				this.chatRooms.add(new MultiUserChat(connection, cr));
+			try {
+				for (MultiUserChat cr : this.chatRooms)
+					cr.join(connection.getUser());
+			} catch (XMPPException e) {
+				System.err.println("Impossible to join or or more GROUPCHAT, terminating");
 				System.exit(-1);
 			}
 		}
@@ -140,27 +170,49 @@ public class SimpleXMPPClient {
 
 	/**
 	 * Sends a message to the whole group chat.
+	 * This method is used only when the client is connected
+	 * to one and only one group chat.
 	 * 
 	 * @param message
 	 */
-	public void sendMessage(String message) {
-		if (connection==null || !connection.isAuthenticated() || !groupChat.isJoined()){
+	public void sendMUCMessage(String message) {
+		if (connection==null || !connection.isAuthenticated() || !onlyOneRoomJoined()) {
 			System.err.println("Impossible to send message to groupchat: we have been disconnected! Terminating");
 			System.exit(-1);
 		}
-		Message m = new Message(groupChat.getRoom(), Message.Type.groupchat);
+		Message m = new Message(chatRooms.get(0).getRoom(), Message.Type.groupchat);
+		m.setBody(message);
+		connection.sendPacket(m);
+	}
+	
+	
+	/**
+	 * Sends a message to a specific group chat.
+	 * This method is used when there are multiple group chats
+	 * the client is connected to and we want to send a message 
+	 * only to a specific one of them.
+	 * 
+	 * @param chatroom
+	 * @param message
+	 */
+	public void sendMUCMessage(String chatroom, String message) {
+		if (connection==null || !connection.isAuthenticated() || !joinedSpecificRoom(chatroom)) {
+			System.err.println("Impossible to send message to groupchat: we have been disconnected! Terminating");
+			System.exit(-1);
+		}
+		Message m = new Message(chatroom, Message.Type.groupchat);
 		m.setBody(message);
 		connection.sendPacket(m);
 	}
 
 
 	/**
-	 * Returns the username.
+	 * Returns the username without the <code>@hostname/resource</code>.
 	 * 
 	 * @return
 	 */
 	public String getUsername() {
-		return connection.getUser();
+		return connection.getUser().split("@")[0];
 	}
 
 
@@ -168,10 +220,11 @@ public class SimpleXMPPClient {
 	 * Disconnects the client.
 	 */
 	public void disconnect() {
-		if (groupChat!=null && groupChat.isJoined()) {
-			groupChat.leave();
-			groupChat = null;
-		}
+		for (MultiUserChat cr: chatRooms)	
+			if (cr!=null && cr.isJoined()) {
+				cr.leave();
+			}
+		chatRooms = null;
 		if (connection.isAuthenticated()) {
 			connection.disconnect();
 			connection = null;
@@ -194,6 +247,37 @@ public class SimpleXMPPClient {
 		if (sa.length!=2 || sa[0]==null || sa[1]==null || sa[0].isEmpty() || sa[1].isEmpty() ) 
 			throw new XMPPException(fullJID + " is not a valid JID");
 		return sa;
+	}
+	
+	
+	private boolean onlyOneRoomJoined() {
+		if (chatRooms.size()==1 && chatRooms.get(0).isJoined())
+			return true;
+		return false;
+	}
+	
+	
+	private boolean joinedSpecificRoom(String chatroom) {
+		if ( chatroom!=null && chatRoomExists(chatroom) && chatRoomIsJoined(chatroom) )
+			return true;
+		return false;
+	}
+
+
+	private boolean chatRoomIsJoined(String chatroom) {
+		for (MultiUserChat muc : chatRooms) 
+			if (muc.getRoom().equals(chatroom) && muc.isJoined())
+				return true;
+		return false;
+	}
+
+
+	private boolean chatRoomExists(String chatroom) {
+		for (MultiUserChat muc : chatRooms) 
+			if (muc.getRoom().equals(chatroom))
+				return true;
+		return false;
+		
 	}
 
 }
