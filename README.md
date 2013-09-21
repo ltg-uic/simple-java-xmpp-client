@@ -1,5 +1,5 @@
 # Simple XMPP Client in Java
-
+[![Build Status](https://travis-ci.org/ltg-uic/simple-java-xmpp-client.png?branch=master)](https://travis-ci.org/ltg-uic/simple-java-xmpp-client)
 
 This is a simple XMPP client written in java and based on Smack. 
 
