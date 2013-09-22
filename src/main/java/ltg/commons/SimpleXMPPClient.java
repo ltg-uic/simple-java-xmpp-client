@@ -176,9 +176,14 @@ public class SimpleXMPPClient {
 	 * @param message
 	 */
 	public void sendMUCMessage(String message) {
-		if (connection==null || !connection.isAuthenticated() || !onlyOneRoomJoined()) {
+		if (connection==null || !connection.isAuthenticated() ) {
 			System.err.println("Impossible to send message to groupchat: we have been disconnected! Terminating");
 			System.exit(-1);
+		}
+		if ( !onlyOneRoomJoined() ) {
+			System.err.println("Can't use this method when multiple group chats have been joined. "
+					+ "How do I know to which one of them I should send your message to?");
+			return;
 		}
 		Message m = new Message(chatRooms.get(0).getRoom(), Message.Type.groupchat);
 		m.setBody(message);
@@ -196,9 +201,13 @@ public class SimpleXMPPClient {
 	 * @param message
 	 */
 	public void sendMUCMessage(String chatroom, String message) {
-		if (connection==null || !connection.isAuthenticated() || !joinedSpecificRoom(chatroom)) {
+		if (connection==null || !connection.isAuthenticated() ) {
 			System.err.println("Impossible to send message to groupchat: we have been disconnected! Terminating");
 			System.exit(-1);
+		}
+		if ( !joinedSpecificRoom(chatroom) ) {
+			System.err.println("Impossible to send message to groupchat: " + chatroom + ". "
+					+ "Make sure the groupchat you are trying to send the message to exists and you joined it.");
 		}
 		Message m = new Message(chatroom, Message.Type.groupchat);
 		m.setBody(message);
