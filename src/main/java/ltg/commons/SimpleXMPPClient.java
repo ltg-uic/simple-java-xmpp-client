@@ -116,7 +116,7 @@ public class SimpleXMPPClient {
 				for (MultiUserChat cr : this.chatRooms)
 					cr.join(connection.getUser());
 			} catch (XMPPException e) {
-				System.err.println("Impossible to join or or more GROUPCHAT, terminating");
+				System.err.println("Impossible to join one or more GROUPCHAT, terminating");
 				System.exit(-1);
 			}
 		}
