@@ -1,5 +1,10 @@
 package ltg.commons.examples;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.jivesoftware.smack.packet.Message;
+
 import ltg.commons.SimpleXMPPClient;
 
 /**
@@ -10,13 +15,16 @@ import ltg.commons.SimpleXMPPClient;
  * @author tebemis
  *
  */
-public class SynchronousXMPPClient {
+public class SynchronousMultiChatroomClient {
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		SimpleXMPPClient sc = new SimpleXMPPClient("test@ltg.evl.uic.edu", "test", "test-room@conference.ltg.evl.uic.edu");
+		List<String> chatrooms = new ArrayList<String>();
+		chatrooms.add("test-room-1@conference.ltg.evl.uic.edu");
+		chatrooms.add("test-room-2@conference.ltg.evl.uic.edu");
+		SimpleXMPPClient sc = new SimpleXMPPClient("test-bot@ltg.evl.uic.edu", "test-bot", chatrooms);
 		
 		// We are now connected and in the group chat room. If we don't do something
 		// the main will terminate... 
@@ -24,7 +32,8 @@ public class SynchronousXMPPClient {
 		// ... so let's go ahead and wait for a message to arrive...
 		while (!Thread.currentThread().isInterrupted()) {
 			// ... and process it ...
-			System.out.println(sc.nextMessage());
+			Message m = sc.nextMessage();
+			System.out.println(m.getFrom() + " " + m.getBody());
 		}
 		// ... and finally disconnect.
 		sc.disconnect();

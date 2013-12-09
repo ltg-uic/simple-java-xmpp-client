@@ -1,5 +1,8 @@
 package ltg.commons.examples;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.jivesoftware.smack.packet.Message;
 
 import ltg.commons.MessageListener;
@@ -14,13 +17,16 @@ import ltg.commons.SimpleXMPPClient;
  * @author tebemis
  *
  */
-public class AsynchronousXMPPClient {
+public class AsynchronousMultiChatroomClient {
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		SimpleXMPPClient sc = new SimpleXMPPClient("test@ltg.evl.uic.edu", "test", "test-room@conference.ltg.evl.uic.edu");
+		List<String> chatrooms = new ArrayList<String>();
+		chatrooms.add("test-room-1@conference.ltg.evl.uic.edu");
+		chatrooms.add("test-room-2@conference.ltg.evl.uic.edu");
+		SimpleXMPPClient sc = new SimpleXMPPClient("test-bot@ltg.evl.uic.edu", "test-bot", chatrooms);
 		
 		// We are now connected and in the group chat room. If we don't do something
 		// the main will terminate... 
@@ -32,14 +38,20 @@ public class AsynchronousXMPPClient {
 			
 			@Override
 			public void processMessage(Message m) {
-				System.out.println(m.getBody());
+				System.out.println(m.getFrom() + " " + m.getBody());
 			}
 		});
 		
 		// ... and now we can make ourselves busy
+		int i = 0;
 		while(true) {
 			try {
+				sc.sendMUCMessage("test-room-1@conference.ltg.evl.uic.edu", "Message " + i);
 				Thread.sleep(5000);
+				i++;
+				sc.sendMUCMessage("test-room-2@conference.ltg.evl.uic.edu", "Message " + i);
+				Thread.sleep(5000);
+				i++;
 			} catch (InterruptedException e) {
 				sc.disconnect();
 			}
